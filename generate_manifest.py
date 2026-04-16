@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 OMIT_FILES = {
     'generate_manifest.py', 'README.md', '.github', '.git', 'index.html',
     'CNAME', 'manifest.json', 'site-src', 'node_modules', 'dist',
-    'convert_to_webp.py', '.gitattributes', '.gitignore'
+    'convert_to_webp.py', '.gitattributes', '.gitignore', 'requirements.txt'
 }
 OMIT_DIRS = {
     '.git', '.github', 'site-src', 'node_modules', 'dist',
