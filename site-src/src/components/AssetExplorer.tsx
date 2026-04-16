@@ -86,10 +86,71 @@ export const AssetExplorer: React.FC = () => {
       .then(res => res.json())
       .then((data: Manifest) => {
         setManifest(data);
-        setCurrentNode(data.root);
+        // Initialize from hash if present
+        const hash = window.location.hash.replace(/^#/, '');
+        if (hash) {
+            const parts = hash.split('/').filter(Boolean).map(p => decodeURIComponent(p));
+            setCurrentPath(parts);
+            
+            let nodes = data.root;
+            let currentNodes = data.root;
+            for (const part of parts) {
+                const folder = currentNodes.find(n => n.name === part && n.type === 'directory');
+                if (folder && folder.children) {
+                    currentNodes = folder.children;
+                } else {
+                    // Invalid path in hash, reset to root
+                    setCurrentPath([]);
+                    currentNodes = data.root;
+                    window.location.hash = '';
+                    break;
+                }
+            }
+            setCurrentNode(currentNodes);
+        } else {
+            setCurrentNode(data.root);
+        }
       })
       .catch(err => console.error("Failed to load manifest", err));
   }, []);
+
+  // Sync hash when path changes (except when triggered by hashchange)
+  useEffect(() => {
+    const currentHash = window.location.hash.replace(/^#/, '');
+    const pathHash = currentPath.map(p => encodeURIComponent(p)).join('/');
+    if (currentHash !== pathHash) {
+        window.location.hash = pathHash;
+    }
+  }, [currentPath]);
+
+  // Handle browser back/forward buttons
+  useEffect(() => {
+    const handleHashChange = () => {
+        if (!manifest) return;
+        const hash = window.location.hash.replace(/^#/, '');
+        const parts = hash.split('/').filter(Boolean).map(p => decodeURIComponent(p));
+        
+        // Only update if hash is different from current state
+        const currentPathStr = currentPath.join('/');
+        const newPathStr = parts.join('/');
+        
+        if (currentPathStr !== newPathStr) {
+            setCurrentPath(parts);
+            let nodes = manifest.root;
+            for (const part of parts) {
+                const folder = nodes.find(n => n.name === part && n.type === 'directory');
+                if (folder && folder.children) {
+                    nodes = folder.children;
+                }
+            }
+            setCurrentNode(nodes);
+            setSearchQuery('');
+        }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [manifest, currentPath]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -123,7 +184,8 @@ export const AssetExplorer: React.FC = () => {
   const navigateTo = (folderName: string) => {
     const folder = currentNode?.find(n => n.name === folderName && n.type === 'directory');
     if (folder && folder.children) {
-      setCurrentPath([...currentPath, folderName]);
+      const newPath = [...currentPath, folderName];
+      setCurrentPath(newPath);
       setCurrentNode(folder.children);
       setSearchQuery('');
     }
@@ -150,6 +212,7 @@ export const AssetExplorer: React.FC = () => {
       setCurrentPath([]);
       setCurrentNode(manifest.root);
       setSearchQuery('');
+      window.location.hash = '';
   }
 
   const copyToClipboard = useCallback((text: string, id: string, e: React.MouseEvent) => {
