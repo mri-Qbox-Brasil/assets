@@ -43,7 +43,7 @@ jobs:
         cache: 'pip'
 
     - name: Install dependencies
-      run: pip install Pillow
+      run: pip install -r requirements.txt
 
     - name: Run Conversion Script
       run: |
