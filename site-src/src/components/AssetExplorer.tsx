@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import {
@@ -22,29 +22,64 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// Types based on generate_manifest.py
+const CDN_BASE = 'https://assets.mriqbox.com.br';
+
+// Types matching the new generate_manifest.py output
+interface FileVariant {
+  ext: string;
+  path: string;
+  size: number;
+}
+
 interface AssetNode {
   name: string;
   path: string;
   type: 'file' | 'directory';
   size?: number;
+  baseName?: string;
+  variants?: FileVariant[];
+  ext?: string;
   children?: AssetNode[];
+}
+
+interface ManifestStats {
+  total_files: number;
+  total_size: number;
 }
 
 interface Manifest {
   root: AssetNode[];
-  generated_at: number;
+  generated_at: string;
+  stats?: ManifestStats;
+}
+
+function formatSize(bytes: number): string {
+  if (bytes >= 1_048_576) return `${(bytes / 1_048_576).toFixed(1)} MB`;
+  if (bytes >= 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${bytes} B`;
+}
+
+function getExtBadgeColor(ext: string): string {
+  switch (ext) {
+    case '.webp': return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+    case '.png': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+    case '.jpg':
+    case '.jpeg': return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+    case '.gif': return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+    case '.svg': return 'bg-pink-500/20 text-pink-400 border-pink-500/30';
+    default: return 'bg-zinc-500/20 text-zinc-400 border-zinc-500/30';
+  }
 }
 
 export const AssetExplorer: React.FC = () => {
   const [manifest, setManifest] = useState<Manifest | null>(null);
   const [currentPath, setCurrentPath] = useState<string[]>([]);
   const [currentNode, setCurrentNode] = useState<AssetNode[] | null>(null);
-  // Removed global search across all files since we only search current folder now,
-  // keeping simple filteredItems logic is fine.
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedState, setCopiedState] = useState<string | null>(null);
-  const [previewImage, setPreviewImage] = useState<{path: string, name: string} | null>(null);
+  const [previewImage, setPreviewImage] = useState<{path: string, name: string, variants?: FileVariant[]} | null>(null);
+  const [expandedCopyId, setExpandedCopyId] = useState<string | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch('/manifest.json')
@@ -55,6 +90,35 @@ export const AssetExplorer: React.FC = () => {
       })
       .catch(err => console.error("Failed to load manifest", err));
   }, []);
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (previewImage) {
+          setPreviewImage(null);
+        } else if (expandedCopyId) {
+          setExpandedCopyId(null);
+        }
+      }
+      // Ctrl+K / Cmd+K to focus search
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [previewImage, expandedCopyId]);
+
+  // Click outside to collapse expanded copy buttons
+  useEffect(() => {
+    if (!expandedCopyId) return;
+    const handleClick = () => setExpandedCopyId(null);
+    window.addEventListener('click', handleClick);
+    return () => window.removeEventListener('click', handleClick);
+  }, [expandedCopyId]);
 
   const navigateTo = (folderName: string) => {
     const folder = currentNode?.find(n => n.name === folderName && n.type === 'directory');
@@ -88,79 +152,40 @@ export const AssetExplorer: React.FC = () => {
       setSearchQuery('');
   }
 
-  const copyToClipboard = (text: string, id: string, e: React.MouseEvent) => {
+  const copyToClipboard = useCallback((text: string, id: string, e: React.MouseEvent) => {
       e.stopPropagation();
       navigator.clipboard.writeText(text).then(() => {
           setCopiedState(id);
           setTimeout(() => setCopiedState(null), 2000);
       });
-  }
+  }, []);
 
-  // Handle ESC key to close preview
-  useEffect(() => {
-      const handleEsc = (e: KeyboardEvent) => {
-          if (e.key === 'Escape') setPreviewImage(null);
-      };
-      window.addEventListener('keydown', handleEsc);
-      return () => window.removeEventListener('keydown', handleEsc);
+  const toggleCopyExpand = useCallback((id: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      setExpandedCopyId(prev => prev === id ? null : id);
   }, []);
 
   if (!manifest) return <div className="min-h-screen flex items-center justify-center text-zinc-400">Carregando arquivos...</div>;
   if (!currentNode) return <div className="min-h-screen flex items-center justify-center text-zinc-400">Iniciando...</div>;
 
-  // Deduplication and Filtering Logic
+  // With the new manifest format, deduplication is already done server-side.
+  // Files with variants are already grouped. We just filter by search query.
   const processNodes = (nodes: AssetNode[], query: string) => {
-      // 1. Filter by search query first
       let filtered = nodes;
       if (query) {
-          filtered = nodes.filter(item => item.name.toLowerCase().includes(query.toLowerCase()));
+          filtered = nodes.filter(item => {
+              const searchName = item.baseName || item.name;
+              return searchName.toLowerCase().includes(query.toLowerCase());
+          });
       }
 
-      // 2. Separate directories and files
       const directories = filtered.filter(n => n.type === 'directory');
       const files = filtered.filter(n => n.type === 'file');
 
-      // 3. Deduplicate files (prioritize WebP)
-      const fileGroups: Record<string, AssetNode[]> = {};
+      // Sort files alphabetically
+      files.sort((a, b) => (a.baseName || a.name).localeCompare(b.baseName || b.name));
 
-      files.forEach(file => {
-          const lastDotIndex = file.name.lastIndexOf('.');
-          const baseName = lastDotIndex !== -1 ? file.name.substring(0, lastDotIndex) : file.name;
-          // Group by base name + path directory (to start simple, just base name is risky if duplicates exist in same folder.
-          // But here we are processing `currentNode` which IS a single folder. So baseName is sufficient.)
-          if (!fileGroups[baseName]) {
-              fileGroups[baseName] = [];
-          }
-          fileGroups[baseName].push(file);
-      });
-
-      const uniqueFiles: AssetNode[] = [];
-
-      Object.values(fileGroups).forEach(group => {
-          if (group.length === 1) {
-              uniqueFiles.push(group[0]);
-          } else {
-              // Priority: webp > png > jpg > jpeg > others
-              // Sort based on priority index
-              group.sort((a, b) => {
-                  const getPriority = (name: string) => {
-                      if (name.endsWith('.webp')) return 0;
-                      if (name.endsWith('.png')) return 1;
-                      if (name.endsWith('.jpg')) return 2;
-                      if (name.endsWith('.jpeg')) return 3;
-                      return 4;
-                  };
-                  return getPriority(a.name) - getPriority(b.name);
-              });
-              uniqueFiles.push(group[0]);
-          }
-      });
-
-      // Sort files alphabetically again after deduplication
-      uniqueFiles.sort((a, b) => a.name.localeCompare(b.name));
-
-      // Combine: Directories first, then Files
-      return [...directories, ...uniqueFiles];
+      return [...directories, ...files];
   };
 
   const visibleItems = processNodes(currentNode, searchQuery);
@@ -179,6 +204,8 @@ export const AssetExplorer: React.FC = () => {
             <div className="relative w-full max-w-md group">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
                 <input
+                    ref={searchInputRef}
+                    id="search-input"
                     type="text"
                     placeholder="Pesquisar..."
                     value={searchQuery}
@@ -191,6 +218,15 @@ export const AssetExplorer: React.FC = () => {
                     </kbd>
                 </div>
             </div>
+
+            {/* Stats */}
+            {manifest.stats && (
+              <div className="hidden lg:flex items-center gap-3 text-xs text-zinc-500 whitespace-nowrap">
+                <span>{manifest.stats.total_files.toLocaleString()} arquivos</span>
+                <span className="text-zinc-700">•</span>
+                <span>{formatSize(manifest.stats.total_size)}</span>
+              </div>
+            )}
         </div>
       </header>
 
@@ -228,7 +264,7 @@ export const AssetExplorer: React.FC = () => {
         listClassName="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 mb-8"
         itemContent={(index: number) => {
             const item = visibleItems[index];
-            if (!item) return null; // Guard against potential out of bounds, though unlikely with totalCount
+            if (!item) return null;
 
             if (item.type === 'directory') {
                 return (
@@ -248,17 +284,19 @@ export const AssetExplorer: React.FC = () => {
             // File Item
             const file = item;
             const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file.name);
+            const hasVariants = file.variants && file.variants.length > 1;
             const copyNameId = `name-${file.path}`;
-            const copyPathId = `path-${file.path}`;
+            const copyLinkId = `link-${file.path}`;
+            const primaryExt = file.name.includes('.') ? '.' + file.name.split('.').pop()?.toLowerCase() : '';
 
             return (
                 <div
-                    className="group relative p-3 bg-zinc-900 border border-zinc-800 rounded-xl hover:bg-zinc-800 hover:border-zinc-700 transition-all flex flex-col items-center gap-3 h-full"
+                    className="group relative p-3 bg-zinc-900 border border-zinc-800 rounded-xl hover:bg-zinc-800 hover:border-zinc-700 transition-all flex flex-col items-center gap-2 h-full"
                 >
                     {isImage ? (
                         <div
                             className="w-full aspect-square bg-zinc-950 rounded-lg overflow-hidden flex items-center justify-center border border-zinc-800/50 cursor-pointer relative"
-                            onClick={() => setPreviewImage({path: file.path, name: file.name})}
+                            onClick={() => setPreviewImage({path: file.path, name: file.name, variants: file.variants})}
                         >
                             <img src={`/${file.path}`} alt={file.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                             <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -271,28 +309,101 @@ export const AssetExplorer: React.FC = () => {
                         </div>
                     )}
 
-                    <div className="w-full flex items-center justify-between gap-2 mt-auto">
-                        <span className="text-xs font-medium truncate flex-1 text-center text-zinc-400 group-hover:text-zinc-200" title={file.name}>
-                            {file.name}
+                    {/* File info: name + badges */}
+                    <div className="w-full flex flex-col items-center gap-1 mt-auto">
+                        <span className="text-xs font-medium truncate w-full text-center text-zinc-400 group-hover:text-zinc-200" title={file.baseName || file.name}>
+                            {file.baseName || file.name}
                         </span>
+                        <div className="flex items-center gap-1 flex-wrap justify-center">
+                            {/* Format badge(s) */}
+                            {hasVariants ? (
+                                file.variants!.map(v => (
+                                    <span key={v.ext} className={cn("text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border", getExtBadgeColor(v.ext))}>
+                                        {v.ext.replace('.', '')}
+                                    </span>
+                                ))
+                            ) : (
+                                <span className={cn("text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border", getExtBadgeColor(primaryExt))}>
+                                    {primaryExt.replace('.', '') || '?'}
+                                </span>
+                            )}
+                            {/* Size */}
+                            {file.size && (
+                                <span className="text-[9px] text-zinc-600 ml-1">
+                                    {formatSize(file.size)}
+                                </span>
+                            )}
+                        </div>
                     </div>
 
                     {/* Hover Actions */}
                     <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        {/* Copy Name */}
                         <button
-                            onClick={(e) => copyToClipboard(file.name, copyNameId, e)}
+                            onClick={(e) => copyToClipboard(file.baseName || file.name, copyNameId, e)}
                             className="bg-black/80 hover:bg-emerald-600 text-white p-1.5 rounded-md shadow-lg backdrop-blur-sm transition-colors"
                             title="Copiar Nome"
                         >
                             {copiedState === copyNameId ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
-                        <button
-                            onClick={(e) => copyToClipboard(file.path, copyPathId, e)}
-                            className="bg-black/80 hover:bg-emerald-600 text-white p-1.5 rounded-md shadow-lg backdrop-blur-sm transition-colors"
-                            title="Copiar Caminho"
-                        >
-                            {copiedState === copyPathId ? <Check className="w-3.5 h-3.5" /> : <LinkIcon className="w-3.5 h-3.5" />}
-                        </button>
+
+                        {/* Copy Link — expands with format badges when multiple variants */}
+                        {hasVariants ? (
+                            <div className="relative" onClick={(e) => e.stopPropagation()}>
+                                <button
+                                    onClick={(e) => toggleCopyExpand(copyLinkId, e)}
+                                    className={cn(
+                                        "bg-black/80 hover:bg-emerald-600 text-white p-1.5 rounded-md shadow-lg backdrop-blur-sm transition-colors",
+                                        expandedCopyId === copyLinkId && "bg-emerald-600"
+                                    )}
+                                    title="Copiar Link"
+                                >
+                                    <LinkIcon className="w-3.5 h-3.5" />
+                                </button>
+                                {/* Expanded variant picker */}
+                                {expandedCopyId === copyLinkId && (
+                                    <div className="absolute right-full mr-1 top-0 flex flex-col gap-1 animate-in slide-in-from-right-2 duration-150">
+                                        {file.variants!.map(v => {
+                                            const variantCopyId = `link-${v.path}`;
+                                            const fullUrl = `${CDN_BASE}/${v.path}`;
+                                            return (
+                                                <button
+                                                    key={v.ext}
+                                                    onClick={(e) => {
+                                                        copyToClipboard(fullUrl, variantCopyId, e);
+                                                    }}
+                                                    className={cn(
+                                                        "flex items-center gap-2 px-2.5 py-1.5 rounded-md shadow-lg backdrop-blur-sm transition-all text-[11px] font-bold uppercase whitespace-nowrap",
+                                                        copiedState === variantCopyId
+                                                            ? "bg-emerald-600 text-white"
+                                                            : `bg-zinc-900/95 border hover:bg-zinc-800 ${getExtBadgeColor(v.ext)}`
+                                                    )}
+                                                    title={`Copiar link ${v.ext}`}
+                                                >
+                                                    {copiedState === variantCopyId ? (
+                                                        <Check className="w-3 h-3" />
+                                                    ) : (
+                                                        <LinkIcon className="w-3 h-3" />
+                                                    )}
+                                                    {v.ext.replace('.', '')}
+                                                    <span className="text-[9px] font-normal opacity-60">{formatSize(v.size)}</span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <button
+                                onClick={(e) => copyToClipboard(`${CDN_BASE}/${file.path}`, copyLinkId, e)}
+                                className="bg-black/80 hover:bg-emerald-600 text-white p-1.5 rounded-md shadow-lg backdrop-blur-sm transition-colors"
+                                title="Copiar Link"
+                            >
+                                {copiedState === copyLinkId ? <Check className="w-3.5 h-3.5" /> : <LinkIcon className="w-3.5 h-3.5" />}
+                            </button>
+                        )}
+
+                        {/* Download */}
                         <a
                             href={`/${file.path}`}
                             download
@@ -329,16 +440,40 @@ export const AssetExplorer: React.FC = () => {
                 <X className="w-8 h-8" />
             </button>
             <div
-                className="max-w-full max-h-full relative"
+                className="max-w-full max-h-full relative flex flex-col items-center gap-4"
                 onClick={(e) => e.stopPropagation()}
             >
                 <img
                     src={`/${previewImage.path}`}
                     alt={previewImage.name}
-                    className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl"
+                    className="max-w-[90vw] max-h-[80vh] object-contain rounded-lg shadow-2xl"
                 />
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm backdrop-blur-md border border-white/10">
-                    {previewImage.name}
+                <div className="flex items-center gap-3 bg-zinc-900/90 px-5 py-3 rounded-xl backdrop-blur-md border border-zinc-800">
+                    <span className="text-sm text-zinc-200 font-medium">{previewImage.name}</span>
+                    {/* Copy links in modal */}
+                    {previewImage.variants && previewImage.variants.length > 0 && (
+                        <div className="flex items-center gap-2 ml-3 pl-3 border-l border-zinc-700">
+                            {previewImage.variants.map(v => {
+                                const modalCopyId = `modal-${v.path}`;
+                                return (
+                                    <button
+                                        key={v.ext}
+                                        onClick={(e) => copyToClipboard(`${CDN_BASE}/${v.path}`, modalCopyId, e)}
+                                        className={cn(
+                                            "flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase transition-colors border",
+                                            copiedState === modalCopyId
+                                                ? "bg-emerald-600 text-white border-emerald-500"
+                                                : `hover:bg-zinc-800 ${getExtBadgeColor(v.ext)}`
+                                        )}
+                                        title={`Copiar link ${v.ext}`}
+                                    >
+                                        {copiedState === modalCopyId ? <Check className="w-3 h-3" /> : <LinkIcon className="w-3 h-3" />}
+                                        {v.ext.replace('.', '')}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

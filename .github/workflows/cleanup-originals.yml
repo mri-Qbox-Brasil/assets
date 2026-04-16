@@ -1,0 +1,135 @@
+name: Cleanup Non-WebP Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (only list files, do not delete)'
+        type: boolean
+        required: true
+        default: true
+
+concurrency:
+  group: cleanup-images
+  cancel-in-progress: false
+
+# ============================================================
+# DIRECTORIES TO CLEAN
+# ============================================================
+# Add directories here as you retire the original formats.
+# Only directories listed below will be processed.
+# The script will ONLY delete non-webp files that have a
+# corresponding .webp version (safe cleanup).
+#
+# Example: to retire originals from 'assets/', add 'assets'
+# to the CLEANUP_DIRS list in the cleanup step below.
+# ============================================================
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Cleanup non-WebP images
+      run: |
+        #!/bin/bash
+        set -euo pipefail
+
+        # =============================================
+        # ADD DIRECTORIES HERE AS YOU RETIRE FORMATS
+        # =============================================
+        CLEANUP_DIRS=(
+          # "assets"
+          # "branding"
+          # "clothing"
+          # "char"
+          # "faces"
+          # "parents"
+          # "props"
+          # "ps-housing"
+        )
+        # =============================================
+
+        DRY_RUN="${{ inputs.dry_run }}"
+        EXTENSIONS=("jpg" "jpeg" "png")
+        TOTAL_FOUND=0
+        TOTAL_DELETED=0
+        TOTAL_SKIPPED=0
+        TOTAL_SAVED=0
+
+        if [ ${#CLEANUP_DIRS[@]} -eq 0 ]; then
+          echo "⚠️  No directories configured for cleanup."
+          echo "Edit this workflow and uncomment directories in CLEANUP_DIRS."
+          exit 0
+        fi
+
+        echo "🧹 Non-WebP Cleanup"
+        echo "   Mode: $([ "$DRY_RUN" = "true" ] && echo "DRY RUN (no deletions)" || echo "LIVE (will delete files)")"
+        echo "   Directories: ${CLEANUP_DIRS[*]}"
+        echo ""
+
+        for dir in "${CLEANUP_DIRS[@]}"; do
+          if [ ! -d "$dir" ]; then
+            echo "⚠️  Directory not found: $dir"
+            continue
+          fi
+
+          echo "📁 $dir/"
+          DIR_DELETED=0
+          DIR_SKIPPED=0
+          DIR_SAVED=0
+
+          for ext in "${EXTENSIONS[@]}"; do
+            find "$dir" -type f -iname "*.${ext}" | while read -r file; do
+              TOTAL_FOUND=$((TOTAL_FOUND + 1))
+              base="${file%.*}"
+              webp_file="${base}.webp"
+
+              if [ -f "$webp_file" ]; then
+                file_size=$(stat -c%s "$file" 2>/dev/null || echo 0)
+
+                if [ "$DRY_RUN" = "true" ]; then
+                  echo "  🔍 Would delete: $file ($(numfmt --to=iec $file_size))"
+                else
+                  rm "$file"
+                  echo "  🗑️  Deleted: $file ($(numfmt --to=iec $file_size))"
+                fi
+
+                DIR_DELETED=$((DIR_DELETED + 1))
+                DIR_SAVED=$((DIR_SAVED + file_size))
+              else
+                DIR_SKIPPED=$((DIR_SKIPPED + 1))
+                echo "  ⏭️  Skipped (no WebP): $file"
+              fi
+            done
+          done
+
+          TOTAL_DELETED=$((TOTAL_DELETED + DIR_DELETED))
+          TOTAL_SKIPPED=$((TOTAL_SKIPPED + DIR_SKIPPED))
+          TOTAL_SAVED=$((TOTAL_SAVED + DIR_SAVED))
+          echo "  → $DIR_DELETED to delete, $DIR_SKIPPED skipped"
+          echo ""
+        done
+
+        echo "========================================"
+        echo "📊 Summary"
+        echo "========================================"
+        echo "  Files to delete: $TOTAL_DELETED"
+        echo "  Files skipped:   $TOTAL_SKIPPED (no WebP pair)"
+        echo "  Space to free:   $(numfmt --to=iec $TOTAL_SAVED)"
+        echo "  Mode:            $([ "$DRY_RUN" = "true" ] && echo "DRY RUN" || echo "LIVE")"
+
+    - name: Commit deletions
+      if: ${{ inputs.dry_run == false }}
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add -A
+        git diff --cached --quiet || git commit -m 'Cleanup: Remove non-WebP originals from retired directories'
+        git pull --rebase origin main
+        git push

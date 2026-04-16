@@ -14,12 +14,17 @@ export default defineConfig({
           const url = req.originalUrl || req.url;
           if (!url) return next();
 
-          if (url === '/manifest.json' || url.startsWith('/assets/') || url.startsWith('/branding/') || url.startsWith('/clothing/') || url.startsWith('/dui/') || url.startsWith('/props/')) {
+          // Serve manifest and all image directories from repo root
+          const servedPaths = [
+            '/manifest.json',
+            '/assets/', '/branding/', '/clothing/', '/dui/', '/props/',
+            '/char/', '/faces/', '/parents/', '/ps-housing/'
+          ];
+
+          if (servedPaths.some(p => url === p || url.startsWith(p))) {
              const filePath = path.resolve(__dirname, '..', url.slice(1)); // Remove leading slash
              try {
                 if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-                   // Let strict mode handling happen if needed, but for dev this is fine
-                   // Determining mime type simply
                    const ext = path.extname(filePath).toLowerCase();
                    const mimeTypes: Record<string, string> = {
                         '.png': 'image/png',
@@ -30,8 +35,9 @@ export default defineConfig({
                         '.json': 'application/json',
                         '.webp': 'image/webp',
                         '.mp4': 'video/mp4',
-                        '.webm': 'video/webm'
-                    };
+                        '.webm': 'video/webm',
+                        '.psd': 'application/octet-stream'
+                   };
                    res.setHeader('Content-Type', mimeTypes[ext] || 'application/octet-stream');
                    fs.createReadStream(filePath).pipe(res);
                    return;
@@ -55,9 +61,9 @@ export default defineConfig({
     emptyOutDir: false, // CRITICAL: Do not delete existing files in root (images, etc)
     rollupOptions: {
         output: {
-            entryFileNames: 'dist/[name].js',
-            chunkFileNames: 'dist/[name].js',
-            assetFileNames: 'dist/[name].[ext]'
+            entryFileNames: 'dist/[name]-[hash].js',
+            chunkFileNames: 'dist/[name]-[hash].js',
+            assetFileNames: 'dist/[name]-[hash].[ext]'
         }
     }
   },
