@@ -92,7 +92,6 @@ export const AssetExplorer: React.FC = () => {
             const parts = hash.split('/').filter(Boolean).map(p => decodeURIComponent(p));
             setCurrentPath(parts);
             
-            let nodes = data.root;
             let currentNodes = data.root;
             for (const part of parts) {
                 const folder = currentNodes.find(n => n.name === part && n.type === 'directory');
@@ -136,14 +135,14 @@ export const AssetExplorer: React.FC = () => {
         
         if (currentPathStr !== newPathStr) {
             setCurrentPath(parts);
-            let nodes = manifest.root;
+            let currentPathNodes = manifest.root;
             for (const part of parts) {
-                const folder = nodes.find(n => n.name === part && n.type === 'directory');
+                const folder = currentPathNodes.find(n => n.name === part && n.type === 'directory');
                 if (folder && folder.children) {
-                    nodes = folder.children;
+                    currentPathNodes = folder.children;
                 }
             }
-            setCurrentNode(nodes);
+            setCurrentNode(currentPathNodes);
             setSearchQuery('');
         }
     };
