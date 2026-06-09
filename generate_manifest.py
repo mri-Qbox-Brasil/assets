@@ -1,13 +1,13 @@
 import os
 import json
+import fnmatch
 import argparse
 from datetime import datetime, timezone
 
 # Configurações
 OMIT_FILES = {
-    'generate_manifest.py', 'README.md', '.github', '.git', 'index.html',
-    'CNAME', 'manifest.json', 'site-src', 'node_modules', 'dist',
-    'convert_to_webp.py', '.gitattributes', '.gitignore', 'requirements.txt'
+    '*.md', '.git*', '*.html', 'CNAME', '*.json',
+    'site-src', 'node_modules', 'dist', '*.py', '*.txt'
 }
 OMIT_DIRS = {
     '.git', '.github', 'site-src', 'node_modules', 'dist',
@@ -92,7 +92,9 @@ def scan_directory(directory, root_dir):
     try:
         with os.scandir(directory) as it:
             for entry in it:
-                if entry.name in OMIT_FILES or entry.name in OMIT_DIRS:
+                if entry.name in OMIT_DIRS or any(
+                    fnmatch.fnmatch(entry.name, pat) for pat in OMIT_FILES
+                ):
                     continue
 
                 relative_path = os.path.relpath(entry.path, root_dir)
