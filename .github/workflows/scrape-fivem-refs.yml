@@ -1,0 +1,59 @@
+name: Scrape FiveM References
+
+# Atualiza as imagens de blips e markers a partir da documentacao oficial do
+# FiveM (citizenfx/fivem-docs). Roda a cada 3 meses; so commita quando ha
+# blips/markers novos ou alterados. O push usa o PAT (GH_TOKEN), entao dispara
+# o workflow "Build and Deploy" (ci.yml), que converte WebP, regenera o
+# manifest e publica no GitHub Pages.
+
+on:
+  schedule:
+    - cron: '0 0 1 */3 *'   # dia 1 a cada 3 meses (jan/abr/jul/out), 00:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: scrape-fivem
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        # PAT para que o push subsequente dispare o ci.yml (deploy). Um push
+        # feito com o GITHUB_TOKEN padrao nao dispara outros workflows.
+        token: ${{ secrets.GH_TOKEN }}
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+        # Sem cache: pip / requirements -- o scraper usa apenas a stdlib.
+
+    - name: Scrape FiveM blips & markers
+      run: python scrape_fivem_refs.py --output .
+
+    - name: Commit new references (if any)
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+        # Considera "mudanca" apenas alteracoes reais de imagem. O index tem um
+        # campo generated_at volatil; nao deve, sozinho, gerar commit/deploy.
+        git add blips markers
+        if git diff --cached --quiet; then
+          echo "Nenhum blip/marker novo. Descartando index (so timestamp mudou)."
+          git checkout -- fivem_refs_index.json 2>/dev/null || true
+        else
+          echo "Blips/markers novos ou alterados detectados. Commitando."
+          git add fivem_refs_index.json
+          git commit -m 'Auto: Update FiveM blips & markers references'
+          git pull --rebase origin main
+          git push
+        fi
