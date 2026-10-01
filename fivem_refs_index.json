@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-06-09T11:52:31.548649+00:00",
+  "generated_at": "2026-10-01T04:28:36.243214+00:00",
   "source": "citizenfx/fivem-docs@master",
   "image_base": "https://docs.fivem.net",
   "stats": {
     "blips": {
-      "total": 958,
-      "available": 919,
+      "total": 966,
+      "available": 927,
       "missing": 39
     },
     "markers": {
@@ -8639,6 +8639,78 @@
       "ext": ".png",
       "file": "blips/957_radar_mansion_ai_gang.png",
       "url": "https://docs.fivem.net/blips/radar_mansion_ai_gang.png",
+      "available": true
+    },
+    {
+      "id": 958,
+      "name": "radar_heist_art_unavailable",
+      "src": "/blips/radar_heist_art_unavailable.png",
+      "ext": ".png",
+      "file": "blips/958_radar_heist_art_unavailable.png",
+      "url": "https://docs.fivem.net/blips/radar_heist_art_unavailable.png",
+      "available": true
+    },
+    {
+      "id": 959,
+      "name": "radar_heist_art",
+      "src": "/blips/radar_heist_art.png",
+      "ext": ".png",
+      "file": "blips/959_radar_heist_art.png",
+      "url": "https://docs.fivem.net/blips/radar_heist_art.png",
+      "available": true
+    },
+    {
+      "id": 960,
+      "name": "radar_property_mansion_art_heist",
+      "src": "/blips/radar_property_mansion_art_heist.png",
+      "ext": ".png",
+      "file": "blips/960_radar_property_mansion_art_heist.png",
+      "url": "https://docs.fivem.net/blips/radar_property_mansion_art_heist.png",
+      "available": true
+    },
+    {
+      "id": 961,
+      "name": "radar_art_heist_prep",
+      "src": "/blips/radar_art_heist_prep.png",
+      "ext": ".png",
+      "file": "blips/961_radar_art_heist_prep.png",
+      "url": "https://docs.fivem.net/blips/radar_art_heist_prep.png",
+      "available": true
+    },
+    {
+      "id": 962,
+      "name": "radar_manhole_key",
+      "src": "/blips/radar_manhole_key.png",
+      "ext": ".png",
+      "file": "blips/962_radar_manhole_key.png",
+      "url": "https://docs.fivem.net/blips/radar_manhole_key.png",
+      "available": true
+    },
+    {
+      "id": 963,
+      "name": "radar_buyers_request",
+      "src": "/blips/radar_buyers_request.png",
+      "ext": ".png",
+      "file": "blips/963_radar_buyers_request.png",
+      "url": "https://docs.fivem.net/blips/radar_buyers_request.png",
+      "available": true
+    },
+    {
+      "id": 964,
+      "name": "radar_armored_caracara",
+      "src": "/blips/radar_armored_caracara.png",
+      "ext": ".png",
+      "file": "blips/964_radar_armored_caracara.png",
+      "url": "https://docs.fivem.net/blips/radar_armored_caracara.png",
+      "available": true
+    },
+    {
+      "id": 965,
+      "name": "radar_witness",
+      "src": "/blips/radar_witness.png",
+      "ext": ".png",
+      "file": "blips/965_radar_witness.png",
+      "url": "https://docs.fivem.net/blips/radar_witness.png",
       "available": true
     }
   ],
