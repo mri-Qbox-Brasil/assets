@@ -781029,13 +781029,13 @@
           "name": "cloth_m_p1-mp_m_christmas2018-0.webp",
           "path": "mri_appearance/cloth_m_p1-mp_m_christmas2018-0.webp",
           "type": "file",
-          "size": 8492,
+          "size": 8362,
           "baseName": "cloth_m_p1-mp_m_christmas2018-0",
           "variants": [
             {
               "ext": ".webp",
               "path": "mri_appearance/cloth_m_p1-mp_m_christmas2018-0.webp",
-              "size": 8492
+              "size": 8362
             }
           ]
         },
@@ -782793,13 +782793,13 @@
           "name": "cloth_m_p2-Male_Heist-0.webp",
           "path": "mri_appearance/cloth_m_p2-Male_Heist-0.webp",
           "type": "file",
-          "size": 5118,
+          "size": 6830,
           "baseName": "cloth_m_p2-Male_Heist-0",
           "variants": [
             {
               "ext": ".webp",
               "path": "mri_appearance/cloth_m_p2-Male_Heist-0.webp",
-              "size": 5118
+              "size": 6830
             }
           ]
         },
@@ -782807,13 +782807,13 @@
           "name": "cloth_m_p2-Male_Heist-1.webp",
           "path": "mri_appearance/cloth_m_p2-Male_Heist-1.webp",
           "type": "file",
-          "size": 5694,
+          "size": 6760,
           "baseName": "cloth_m_p2-Male_Heist-1",
           "variants": [
             {
               "ext": ".webp",
               "path": "mri_appearance/cloth_m_p2-Male_Heist-1.webp",
-              "size": 5694
+              "size": 6760
             }
           ]
         },
@@ -782821,13 +782821,13 @@
           "name": "cloth_m_p2-Male_Heist-2.webp",
           "path": "mri_appearance/cloth_m_p2-Male_Heist-2.webp",
           "type": "file",
-          "size": 6872,
+          "size": 7658,
           "baseName": "cloth_m_p2-Male_Heist-2",
           "variants": [
             {
               "ext": ".webp",
               "path": "mri_appearance/cloth_m_p2-Male_Heist-2.webp",
-              "size": 6872
+              "size": 7658
             }
           ]
         },
@@ -979307,9 +979307,9 @@
       ]
     }
   ],
-  "generated_at": "2026-10-01T04:30:39.603486+00:00",
+  "generated_at": "2026-10-06T05:34:54.308221+00:00",
   "stats": {
     "total_files": 64302,
-    "total_size": 725477108
+    "total_size": 725480542
   }
 }
