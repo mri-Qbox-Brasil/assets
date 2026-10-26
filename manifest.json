@@ -299202,6 +299202,405 @@
       "type": "directory",
       "children": [
         {
+          "name": "presets",
+          "path": "mri_appearance/presets",
+          "type": "directory",
+          "children": [
+            {
+              "name": "preset_face_1-1790890523.webp",
+              "path": "mri_appearance/presets/preset_face_1-1790890523.webp",
+              "type": "file",
+              "size": 6882,
+              "baseName": "preset_face_1-1790890523",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_1-1790890523.webp",
+                  "size": 6882
+                }
+              ]
+            },
+            {
+              "name": "preset_face_10-1790890526.webp",
+              "path": "mri_appearance/presets/preset_face_10-1790890526.webp",
+              "type": "file",
+              "size": 9222,
+              "baseName": "preset_face_10-1790890526",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_10-1790890526.webp",
+                  "size": 9222
+                }
+              ]
+            },
+            {
+              "name": "preset_face_11-1790890527.webp",
+              "path": "mri_appearance/presets/preset_face_11-1790890527.webp",
+              "type": "file",
+              "size": 8258,
+              "baseName": "preset_face_11-1790890527",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_11-1790890527.webp",
+                  "size": 8258
+                }
+              ]
+            },
+            {
+              "name": "preset_face_12-1790890527.webp",
+              "path": "mri_appearance/presets/preset_face_12-1790890527.webp",
+              "type": "file",
+              "size": 10126,
+              "baseName": "preset_face_12-1790890527",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_12-1790890527.webp",
+                  "size": 10126
+                }
+              ]
+            },
+            {
+              "name": "preset_face_13-1790890527.webp",
+              "path": "mri_appearance/presets/preset_face_13-1790890527.webp",
+              "type": "file",
+              "size": 9736,
+              "baseName": "preset_face_13-1790890527",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_13-1790890527.webp",
+                  "size": 9736
+                }
+              ]
+            },
+            {
+              "name": "preset_face_14-1790890528.webp",
+              "path": "mri_appearance/presets/preset_face_14-1790890528.webp",
+              "type": "file",
+              "size": 9302,
+              "baseName": "preset_face_14-1790890528",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_14-1790890528.webp",
+                  "size": 9302
+                }
+              ]
+            },
+            {
+              "name": "preset_face_15-1790890528.webp",
+              "path": "mri_appearance/presets/preset_face_15-1790890528.webp",
+              "type": "file",
+              "size": 9140,
+              "baseName": "preset_face_15-1790890528",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_15-1790890528.webp",
+                  "size": 9140
+                }
+              ]
+            },
+            {
+              "name": "preset_face_16-1790890528.webp",
+              "path": "mri_appearance/presets/preset_face_16-1790890528.webp",
+              "type": "file",
+              "size": 9046,
+              "baseName": "preset_face_16-1790890528",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_16-1790890528.webp",
+                  "size": 9046
+                }
+              ]
+            },
+            {
+              "name": "preset_face_2-1790890523.webp",
+              "path": "mri_appearance/presets/preset_face_2-1790890523.webp",
+              "type": "file",
+              "size": 6476,
+              "baseName": "preset_face_2-1790890523",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_2-1790890523.webp",
+                  "size": 6476
+                }
+              ]
+            },
+            {
+              "name": "preset_face_3-1790890523.webp",
+              "path": "mri_appearance/presets/preset_face_3-1790890523.webp",
+              "type": "file",
+              "size": 5896,
+              "baseName": "preset_face_3-1790890523",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_3-1790890523.webp",
+                  "size": 5896
+                }
+              ]
+            },
+            {
+              "name": "preset_face_4-1790890523.webp",
+              "path": "mri_appearance/presets/preset_face_4-1790890523.webp",
+              "type": "file",
+              "size": 6404,
+              "baseName": "preset_face_4-1790890523",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_4-1790890523.webp",
+                  "size": 6404
+                }
+              ]
+            },
+            {
+              "name": "preset_face_5-1790890524.webp",
+              "path": "mri_appearance/presets/preset_face_5-1790890524.webp",
+              "type": "file",
+              "size": 7424,
+              "baseName": "preset_face_5-1790890524",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_5-1790890524.webp",
+                  "size": 7424
+                }
+              ]
+            },
+            {
+              "name": "preset_face_6-1790890524.webp",
+              "path": "mri_appearance/presets/preset_face_6-1790890524.webp",
+              "type": "file",
+              "size": 6370,
+              "baseName": "preset_face_6-1790890524",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_6-1790890524.webp",
+                  "size": 6370
+                }
+              ]
+            },
+            {
+              "name": "preset_face_7-1790890524.webp",
+              "path": "mri_appearance/presets/preset_face_7-1790890524.webp",
+              "type": "file",
+              "size": 7610,
+              "baseName": "preset_face_7-1790890524",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_7-1790890524.webp",
+                  "size": 7610
+                }
+              ]
+            },
+            {
+              "name": "preset_face_8-1790890525.webp",
+              "path": "mri_appearance/presets/preset_face_8-1790890525.webp",
+              "type": "file",
+              "size": 6726,
+              "baseName": "preset_face_8-1790890525",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_8-1790890525.webp",
+                  "size": 6726
+                }
+              ]
+            },
+            {
+              "name": "preset_face_9-1790890526.webp",
+              "path": "mri_appearance/presets/preset_face_9-1790890526.webp",
+              "type": "file",
+              "size": 8942,
+              "baseName": "preset_face_9-1790890526",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_face_9-1790890526.webp",
+                  "size": 8942
+                }
+              ]
+            },
+            {
+              "name": "preset_look_17-1790902338.webp",
+              "path": "mri_appearance/presets/preset_look_17-1790902338.webp",
+              "type": "file",
+              "size": 7738,
+              "baseName": "preset_look_17-1790902338",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_look_17-1790902338.webp",
+                  "size": 7738
+                }
+              ]
+            },
+            {
+              "name": "preset_look_18-1790902339.webp",
+              "path": "mri_appearance/presets/preset_look_18-1790902339.webp",
+              "type": "file",
+              "size": 6190,
+              "baseName": "preset_look_18-1790902339",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_look_18-1790902339.webp",
+                  "size": 6190
+                }
+              ]
+            },
+            {
+              "name": "preset_look_19-1790902339.webp",
+              "path": "mri_appearance/presets/preset_look_19-1790902339.webp",
+              "type": "file",
+              "size": 6924,
+              "baseName": "preset_look_19-1790902339",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_look_19-1790902339.webp",
+                  "size": 6924
+                }
+              ]
+            },
+            {
+              "name": "preset_look_20-1790902339.webp",
+              "path": "mri_appearance/presets/preset_look_20-1790902339.webp",
+              "type": "file",
+              "size": 9458,
+              "baseName": "preset_look_20-1790902339",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_look_20-1790902339.webp",
+                  "size": 9458
+                }
+              ]
+            },
+            {
+              "name": "preset_look_21-1790902340.webp",
+              "path": "mri_appearance/presets/preset_look_21-1790902340.webp",
+              "type": "file",
+              "size": 7310,
+              "baseName": "preset_look_21-1790902340",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_look_21-1790902340.webp",
+                  "size": 7310
+                }
+              ]
+            },
+            {
+              "name": "preset_look_22-1790902340.webp",
+              "path": "mri_appearance/presets/preset_look_22-1790902340.webp",
+              "type": "file",
+              "size": 8500,
+              "baseName": "preset_look_22-1790902340",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_look_22-1790902340.webp",
+                  "size": 8500
+                }
+              ]
+            },
+            {
+              "name": "preset_look_23-1790902341.webp",
+              "path": "mri_appearance/presets/preset_look_23-1790902341.webp",
+              "type": "file",
+              "size": 8232,
+              "baseName": "preset_look_23-1790902341",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_look_23-1790902341.webp",
+                  "size": 8232
+                }
+              ]
+            },
+            {
+              "name": "preset_look_24-1790902342.webp",
+              "path": "mri_appearance/presets/preset_look_24-1790902342.webp",
+              "type": "file",
+              "size": 7406,
+              "baseName": "preset_look_24-1790902342",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_look_24-1790902342.webp",
+                  "size": 7406
+                }
+              ]
+            },
+            {
+              "name": "preset_look_25-1790902342.webp",
+              "path": "mri_appearance/presets/preset_look_25-1790902342.webp",
+              "type": "file",
+              "size": 8428,
+              "baseName": "preset_look_25-1790902342",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_look_25-1790902342.webp",
+                  "size": 8428
+                }
+              ]
+            },
+            {
+              "name": "preset_look_26-1790902342.webp",
+              "path": "mri_appearance/presets/preset_look_26-1790902342.webp",
+              "type": "file",
+              "size": 7592,
+              "baseName": "preset_look_26-1790902342",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_look_26-1790902342.webp",
+                  "size": 7592
+                }
+              ]
+            },
+            {
+              "name": "preset_look_27-1790902343.webp",
+              "path": "mri_appearance/presets/preset_look_27-1790902343.webp",
+              "type": "file",
+              "size": 8208,
+              "baseName": "preset_look_27-1790902343",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_look_27-1790902343.webp",
+                  "size": 8208
+                }
+              ]
+            },
+            {
+              "name": "preset_look_28-1790902343.webp",
+              "path": "mri_appearance/presets/preset_look_28-1790902343.webp",
+              "type": "file",
+              "size": 8312,
+              "baseName": "preset_look_28-1790902343",
+              "variants": [
+                {
+                  "ext": ".webp",
+                  "path": "mri_appearance/presets/preset_look_28-1790902343.webp",
+                  "size": 8312
+                }
+              ]
+            }
+          ]
+        },
+        {
           "name": "cloth_f_c1-base-0.webp",
           "path": "mri_appearance/cloth_f_c1-base-0.webp",
           "type": "file",
@@ -979307,9 +979706,9 @@
       ]
     }
   ],
-  "generated_at": "2026-10-06T05:34:54.308221+00:00",
+  "generated_at": "2026-10-26T03:34:41.467566+00:00",
   "stats": {
-    "total_files": 64302,
-    "total_size": 725480542
+    "total_files": 64330,
+    "total_size": 725702400
   }
 }
